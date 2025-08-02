@@ -3,6 +3,9 @@
 
 function doPost(e) {
   try {
+    // CORS headers ekle
+    const output = ContentService.createTextOutput();
+    
     // Gelen JSON verisini parse et
     const data = JSON.parse(e.postData.contents);
     
@@ -36,9 +39,10 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
       
   } catch (error) {
-    // Hata durumunda
+    // Hata durumunda detaylı log
+    console.error('Google Apps Script Hatası:', error);
     return ContentService
-      .createTextOutput(JSON.stringify({success: false, error: error.toString()}))
+      .createTextOutput(JSON.stringify({success: false, error: error.toString(), stack: error.stack}))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
