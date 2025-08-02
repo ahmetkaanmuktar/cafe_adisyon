@@ -914,16 +914,32 @@
         // Bekleyen müşterileri Google Sheets'ten çek
         async function fetchPendingCustomers() {
             try {
+                console.log('Bekleyen müşteriler çekiliyor...');
+                
                 const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getPendingCustomers`, {
                     method: 'GET',
                     mode: 'cors'
                 });
                 
+                console.log('Pending customers response status:', response.status);
+                
                 if (!response.ok) {
                     throw new Error(`HTTP Error: ${response.status}`);
                 }
                 
-                const data = await response.json();
+                const responseText = await response.text();
+                console.log('Pending customers response text:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse hatası:', parseError);
+                    throw new Error('Sunucudan geçersiz yanıt alındı');
+                }
+                
+                console.log('Parsed pending customers data:', data);
+                
                 if (data.success && data.pendingCustomers) {
                     displayPendingCustomers(data.pendingCustomers);
                     showMessage('success', '✅ Bekleyen müşteriler güncellendi!');
@@ -945,10 +961,22 @@
                         }
                     ];
                     displayPendingCustomers(demoPendingCustomers);
+                    showMessage('info', 'ℹ️ Demo modunda çalışıyor - Örnek bekleyen müşteriler gösteriliyor');
                 }
             } catch (error) {
                 console.error('Bekleyen müşteriler çekilirken hata:', error);
-                showMessage('error', '❌ Bekleyen müşteriler yüklenirken hata oluştu.');
+                showMessage('error', `❌ Bekleyen müşteriler yüklenirken hata oluştu: ${error.message}`);
+                
+                // Hata durumunda demo veriler göster
+                const demoPendingCustomers = [
+                    {
+                        tarih: new Date().toLocaleString('tr-TR'),
+                        customerName: 'Demo Müşteri',
+                        status: 'Bekliyor',
+                        approvalDate: ''
+                    }
+                ];
+                displayPendingCustomers(demoPendingCustomers);
             }
         }
 

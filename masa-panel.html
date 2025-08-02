@@ -493,6 +493,67 @@
             box-shadow: 0 8px 20px rgba(243, 156, 18, 0.3);
         }
 
+        .order-history-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 20px;
+            border: 2px solid #dee2e6;
+        }
+
+        .order-history-section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .refresh-history-btn {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .refresh-history-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
+        }
+
+        .order-history-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .order-history-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-history-table th,
+        .order-history-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .order-history-table th {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            font-weight: bold;
+        }
+
+        .order-history-table tr:hover {
+            background: #f8f9fa;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -573,9 +634,30 @@
             
             <!-- Sipariş Bölümü -->
             <div class="order-section" id="orderSection">
+                <!-- Geçmiş Siparişler -->
+                <div class="order-history-section">
+                    <h2>📋 Geçmiş Siparişlerim</h2>
+                    <button onclick="fetchMyOrders()" class="refresh-history-btn">🔄 Siparişlerimi Yenile</button>
+                    <div class="order-history-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ürün</th>
+                                    <th>Adet</th>
+                                    <th>Fiyat</th>
+                                    <th>Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody id="myOrdersTableBody">
+                                <!-- Geçmiş siparişler buraya eklenecek -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
                 <form id="orderForm">
                     <div class="products-section">
-                        <h2>🍽️ Ürünler</h2>
+                        <h2>🍽️ Yeni Sipariş</h2>
                         
                         <div class="product-item">
                             <div class="product-info">
@@ -861,6 +943,8 @@
                         setTimeout(() => {
                             document.getElementById('approvalSection').style.display = 'none';
                             document.getElementById('orderSection').classList.add('show');
+                            // Geçmiş siparişleri yükle
+                            fetchMyOrders();
                         }, 2000);
                     } else if (result.status === 'Reddedildi') {
                         showStatusMessage('❌ Onay talebiniz reddedildi.', 'rejected');
@@ -1046,6 +1130,106 @@
                     throw new Error(`Bağlantı hatası: ${fetchError.message}`);
                 }
             }
+        }
+
+        // Müşterinin geçmiş siparişlerini çek
+        async function fetchMyOrders() {
+            if (!currentCustomerName) {
+                showMessage('error', '❌ Müşteri adı bulunamadı.');
+                return;
+            }
+
+            try {
+                console.log('Geçmiş siparişler çekiliyor...');
+                
+                const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getOrders`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+                
+                const responseText = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse hatası:', parseError);
+                    throw new Error('Sunucudan geçersiz yanıt alındı');
+                }
+                
+                if (data.success && data.orders) {
+                    // Sadece bu müşterinin siparişlerini filtrele
+                    const myOrders = data.orders.filter(order => 
+                        order.masaAdi === currentCustomerName
+                    );
+                    
+                    displayMyOrders(myOrders);
+                    showMessage('success', '✅ Geçmiş siparişleriniz güncellendi!');
+                } else {
+                    console.log('Demo mode - Örnek geçmiş siparişler gösteriliyor');
+                    // Demo veriler
+                    const demoMyOrders = [
+                        {
+                            urun: '🫖 Çay',
+                            adet: 2,
+                            toplamFiyat: 15,
+                            tarih: new Date().toLocaleString('tr-TR')
+                        },
+                        {
+                            urun: '🥪 Dana Sucuklu Tost (Tam)',
+                            adet: 1,
+                            toplamFiyat: 150,
+                            tarih: new Date().toLocaleString('tr-TR')
+                        }
+                    ];
+                    displayMyOrders(demoMyOrders);
+                    showMessage('info', 'ℹ️ Demo modunda çalışıyor - Örnek geçmiş siparişler gösteriliyor');
+                }
+            } catch (error) {
+                console.error('Geçmiş siparişler çekilirken hata:', error);
+                showMessage('error', `❌ Geçmiş siparişler yüklenirken hata oluştu: ${error.message}`);
+                
+                // Hata durumunda demo veriler göster
+                const demoMyOrders = [
+                    {
+                        urun: '🫖 Çay',
+                        adet: 1,
+                        toplamFiyat: 7.5,
+                        tarih: new Date().toLocaleString('tr-TR')
+                    }
+                ];
+                displayMyOrders(demoMyOrders);
+            }
+        }
+
+        // Geçmiş siparişleri tabloda göster
+        function displayMyOrders(myOrders) {
+            const tbody = document.getElementById('myOrdersTableBody');
+            
+            if (myOrders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px; color: #6c757d;">Henüz sipariş bulunmuyor</td></tr>';
+                return;
+            }
+            
+            // En yeni siparişlerden başlayarak sırala
+            const sortedOrders = myOrders.sort((a, b) => new Date(b.tarih) - new Date(a.tarih));
+            
+            tbody.innerHTML = sortedOrders.map(order => {
+                const toplamFiyat = parseFloat(order.toplamFiyat) || 0;
+                const adet = parseInt(order.adet) || 1;
+                
+                return `
+                    <tr>
+                        <td><strong>${order.urun || 'Bilinmeyen'}</strong></td>
+                        <td>${adet}</td>
+                        <td><strong>${toplamFiyat.toFixed(2)} TL</strong></td>
+                        <td>${order.tarih || 'Bilinmeyen'}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // Sayfa yüklendiğinde
