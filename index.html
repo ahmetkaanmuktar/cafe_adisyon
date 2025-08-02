@@ -796,16 +796,31 @@
                     
                     <div class="product-item">
                         <div class="product-info">
+                            <span class="product-emoji">🥤</span>
+                            <div class="product-details">
+                                <h3>Meyveli Soda</h3>
+                                <div class="product-price">20 TL</div>
+                            </div>
+                        </div>
+                        <div class="quantity-input">
+                            <button type="button" onclick="changeQuantity('meyveliSoda', -1)">-</button>
+                            <input type="number" id="meyveliSoda" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('meyveliSoda', 1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
                             <span class="product-emoji">💧</span>
                             <div class="product-details">
-                                <h3>Küçük Su</h3>
+                                <h3>Su</h3>
                                 <div class="product-price">7.5 TL</div>
                             </div>
                         </div>
                         <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('kucukSu', -1)">-</button>
-                            <input type="number" id="kucukSu" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('kucukSu', 1)">+</button>
+                            <button type="button" onclick="changeQuantity('su', -1)">-</button>
+                            <input type="number" id="su" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('su', 1)">+</button>
                         </div>
                     </div>
                     
@@ -814,7 +829,7 @@
                             <span class="product-emoji">🚰</span>
                             <div class="product-details">
                                 <h3>Büyük Su</h3>
-                                <div class="product-price">7.5 TL</div>
+                                <div class="product-price">20 TL</div>
                             </div>
                         </div>
                         <div class="quantity-input">
@@ -826,16 +841,31 @@
                     
                     <div class="product-item">
                         <div class="product-info">
-                            <span class="product-emoji">🥪</span>
+                            <span class="product-emoji">🥤</span>
                             <div class="product-details">
-                                <h3>Tost (Yarım)</h3>
-                                <div class="product-price">60 TL</div>
+                                <h3>Sade Soda</h3>
+                                <div class="product-price">15 TL</div>
                             </div>
                         </div>
                         <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('tostYarim', -1)">-</button>
-                            <input type="number" id="tostYarim" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('tostYarim', 1)">+</button>
+                            <button type="button" onclick="changeQuantity('sadeSoda', -1)">-</button>
+                            <input type="number" id="sadeSoda" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('sadeSoda', 1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-emoji">🥪</span>
+                            <div class="product-details">
+                                <h3>Dana Sucuklu Tost (Yarım)</h3>
+                                <div class="product-price">75 TL</div>
+                            </div>
+                        </div>
+                        <div class="quantity-input">
+                            <button type="button" onclick="changeQuantity('danaTostYarim', -1)">-</button>
+                            <input type="number" id="danaTostYarim" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('danaTostYarim', 1)">+</button>
                         </div>
                     </div>
                     
@@ -843,29 +873,44 @@
                         <div class="product-info">
                             <span class="product-emoji">🥪🧀</span>
                             <div class="product-details">
-                                <h3>Tost (Tam)</h3>
-                                <div class="product-price">120 TL</div>
+                                <h3>Dana Sucuklu Tost (Tam)</h3>
+                                <div class="product-price">150 TL</div>
                             </div>
                         </div>
                         <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('tostTam', -1)">-</button>
-                            <input type="number" id="tostTam" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('tostTam', 1)">+</button>
+                            <button type="button" onclick="changeQuantity('danaTostTam', -1)">-</button>
+                            <input type="number" id="danaTostTam" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('danaTostTam', 1)">+</button>
                         </div>
                     </div>
                     
                     <div class="product-item">
                         <div class="product-info">
-                            <span class="product-emoji">🥛</span>
+                            <span class="product-emoji">🥤</span>
                             <div class="product-details">
-                                <h3>Ayran</h3>
-                                <div class="product-price">10 TL</div>
+                                <h3>Fanta Kola</h3>
+                                <div class="product-price">40 TL</div>
                             </div>
                         </div>
                         <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('ayran', -1)">-</button>
-                            <input type="number" id="ayran" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('ayran', 1)">+</button>
+                            <button type="button" onclick="changeQuantity('fantaKola', -1)">-</button>
+                            <input type="number" id="fantaKola" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('fantaKola', 1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-emoji">🥤</span>
+                            <div class="product-details">
+                                <h3>Ankara Gazoz</h3>
+                                <div class="product-price">30 TL</div>
+                            </div>
+                        </div>
+                        <div class="quantity-input">
+                            <button type="button" onclick="changeQuantity('ankaraGazoz', -1)">-</button>
+                            <input type="number" id="ankaraGazoz" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('ankaraGazoz', 1)">+</button>
                         </div>
                     </div>
                 </div>
@@ -903,11 +948,14 @@
         // Ürün fiyatları
         const products = {
             cay: { name: '🫖 Çay', price: 7.5 },
-            kucukSu: { name: '💧 Küçük Su', price: 7.5 },
-            buyukSu: { name: '🚰 Büyük Su', price: 7.5 },
-            tostYarim: { name: '🥪 Tost (Yarım)', price: 60 },
-            tostTam: { name: '🥪🧀 Tost (Tam)', price: 120 },
-            ayran: { name: '🥛 Ayran', price: 10 }
+            meyveliSoda: { name: '🥤 Meyveli Soda', price: 20 },
+            su: { name: '💧 Su', price: 7.5 },
+            buyukSu: { name: '🚰 Büyük Su', price: 20 },
+            sadeSoda: { name: '🥤 Sade Soda', price: 15 },
+            danaTostYarim: { name: '🥪 Dana Sucuklu Tost (Yarım)', price: 75 },
+            danaTostTam: { name: '🥪🧀 Dana Sucuklu Tost (Tam)', price: 150 },
+            fantaKola: { name: '🥤 Fanta Kola', price: 40 },
+            ankaraGazoz: { name: '🥤 Ankara Gazoz', price: 30 }
         };
 
         // Google Sheets Web App URL'i - Bu kısmı kendi Google Apps Script URL'iniz ile değiştirin
