@@ -923,13 +923,26 @@
                 <!-- Anlık Siparişler Bölümü -->
                 <div class="live-orders-section" id="liveOrdersSection" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="margin: 0;">🔔 Tüm Siparişler (12 Saat)</h3>
+                        <h3 style="margin: 0;">🔔 Anlık Siparişler (12 Saat)</h3>
                         <button type="button" onclick="clearAllOrders()" class="clear-orders-btn">
                             🗑️ Temizle
                         </button>
                     </div>
                     <div class="live-orders-list" id="liveOrdersList">
                         <!-- Siparişler buraya eklenecek -->
+                    </div>
+                </div>
+                
+                <!-- Eski Siparişler Bölümü -->
+                <div class="live-orders-section" id="oldOrdersSection" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0;">📋 Eski Siparişlerim</h3>
+                        <button type="button" onclick="refreshOldOrders()" class="clear-orders-btn">
+                            🔄 Yenile
+                        </button>
+                    </div>
+                    <div class="live-orders-list" id="oldOrdersList">
+                        <!-- Eski siparişler buraya eklenecek -->
                     </div>
                 </div>
                 
@@ -958,12 +971,14 @@
             ankaraGazoz: { name: '🥤 Ankara Gazoz', price: 30 }
         };
 
-        // Google Sheets Web App URL'i - Bu kısmı kendi Google Apps Script URL'iniz ile değiştirin
-        const GOOGLE_SHEETS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+            // Google Sheets Web App URL'i - Bu kısmı kendi Google Apps Script URL'iniz ile değiştirin
+    // Örnek: https://script.google.com/macros/s/AKfycbz1234567890abcdef/exec
+    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
 
         // Anlık siparişler için global değişkenler
         let liveOrders = [];
         let orderIdCounter = 1;
+        let oldOrders = [];
 
         // Müşteri adı saklama fonksiyonları
         function saveCustomerName(name) {
@@ -1074,11 +1089,14 @@
         function getProductEmoji(productName) {
             const emojiMap = {
                 '🫖 Çay': '🫖',
-                '💧 Küçük Su': '💧',
+                '🥤 Meyveli Soda': '🥤',
+                '💧 Su': '💧',
                 '🚰 Büyük Su': '🚰',
-                '🥪 Tost (Yarım)': '🥪',
-                '🥪🧀 Tost (Tam)': '🥪🧀',
-                '🥛 Ayran': '🥛'
+                '🥤 Sade Soda': '🥤',
+                '🥪 Dana Sucuklu Tost (Yarım)': '🥪',
+                '🥪🧀 Dana Sucuklu Tost (Tam)': '🥪🧀',
+                '🥤 Fanta Kola': '🥤',
+                '🥤 Ankara Gazoz': '🥤'
             };
             return emojiMap[productName] || '🍽️';
         }
@@ -1099,6 +1117,109 @@
                     displayLiveOrders();
                 }, 500);
             }
+        }
+
+        // Eski siparişleri Google Sheets'ten çek
+        async function fetchOldOrders() {
+            const customerName = document.getElementById('musteriAdi').value.trim();
+            if (!customerName) {
+                return;
+            }
+
+            try {
+                // Eğer Google Sheets URL'i ayarlanmamışsa demo mode
+                if (GOOGLE_SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+                    console.log('Demo Mode - Örnek eski siparişler gösteriliyor');
+                    // Demo veriler
+                    oldOrders = [
+                        {
+                            tarih: new Date(Date.now() - 86400000).toLocaleString('tr-TR'), // 1 gün önce
+                            masaAdi: customerName,
+                            urun: '🫖 Çay',
+                            toplamFiyat: 15,
+                            ekleyen: 'Müşteri Ekledi'
+                        },
+                        {
+                            tarih: new Date(Date.now() - 172800000).toLocaleString('tr-TR'), // 2 gün önce
+                            masaAdi: customerName,
+                            urun: '🥪 Dana Sucuklu Tost (Tam)',
+                            toplamFiyat: 150,
+                            ekleyen: 'Müşteri Ekledi'
+                        }
+                    ];
+                    displayOldOrders();
+                    return;
+                }
+
+                const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getOrders&customerName=${encodeURIComponent(customerName)}`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                const responseText = await response.text();
+                console.log('Old orders response:', responseText);
+
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse hatası:', parseError);
+                    throw new Error('Sunucudan geçersiz yanıt alındı');
+                }
+
+                if (data.success && data.orders) {
+                    oldOrders = data.orders;
+                    displayOldOrders();
+                } else {
+                    oldOrders = [];
+                    displayOldOrders();
+                }
+            } catch (error) {
+                console.error('Eski siparişler çekilirken hata:', error);
+                oldOrders = [];
+                displayOldOrders();
+            }
+        }
+
+        // Eski siparişleri görüntüle
+        function displayOldOrders() {
+            const oldOrdersSection = document.getElementById('oldOrdersSection');
+            const oldOrdersList = document.getElementById('oldOrdersList');
+            
+            if (oldOrders.length === 0) {
+                oldOrdersSection.style.display = 'none';
+                return;
+            }
+            
+            oldOrdersSection.style.display = 'block';
+            
+            // En yeni siparişlerden başlayarak sırala
+            const sortedOrders = oldOrders.sort((a, b) => new Date(b.tarih) - new Date(a.tarih));
+            
+            oldOrdersList.innerHTML = sortedOrders.map(order => {
+                const productEmoji = getProductEmoji(order.urun);
+                return `
+                    <div class="live-order-item">
+                        <div class="live-order-info">
+                            <span class="live-order-emoji">${productEmoji}</span>
+                            <div class="live-order-details">
+                                <h4>${order.urun}</h4>
+                                <p class="live-order-time">${order.tarih}</p>
+                            </div>
+                        </div>
+                        <div class="live-order-price">${order.toplamFiyat} TL</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Eski siparişleri yenile
+        function refreshOldOrders() {
+            fetchOldOrders();
         }
 
         function changeQuantity(productId, change) {
@@ -1158,10 +1279,8 @@
             // Müşteri adını sakla
             const customerName = document.getElementById('musteriAdi').value.trim();
             
+            // Sadece form'u reset et, ürün miktarlarını sıfırlama
             document.getElementById('orderForm').reset();
-            Object.keys(products).forEach(productId => {
-                document.getElementById(productId).value = 0;
-            });
             
             // Müşteri adını geri yükle
             if (customerName) {
@@ -1169,6 +1288,7 @@
                 saveCustomerName(customerName);
             }
             
+            // Toplam tutarı güncelle (ürün miktarları değişmediği için aynı kalacak)
             updateTotal();
             // İlk ürüne odaklan (müşteri adı zaten dolu)
             document.getElementById('cay').parentElement.querySelector('button[onclick*="+1"]').focus();
@@ -1285,7 +1405,24 @@
             if (savedName) {
                 document.getElementById('musteriAdi').value = savedName;
                 showMessage('success', `✅ Hoş geldiniz ${savedName}! (12 saat boyunca hatırlandı)`);
+                // Eski siparişleri çek
+                fetchOldOrders();
             }
+            
+            // Müşteri adı değiştiğinde eski siparişleri çek
+            document.getElementById('musteriAdi').addEventListener('input', function() {
+                const customerName = this.value.trim();
+                if (customerName) {
+                    // Kısa bir gecikme ile eski siparişleri çek (kullanıcı yazmayı bitirdikten sonra)
+                    clearTimeout(window.customerNameTimeout);
+                    window.customerNameTimeout = setTimeout(() => {
+                        fetchOldOrders();
+                    }, 1000);
+                } else {
+                    // Müşteri adı boşsa eski siparişleri gizle
+                    document.getElementById('oldOrdersSection').style.display = 'none';
+                }
+            });
         });
     </script>
 </body>

@@ -171,7 +171,7 @@ function doGet(e) {
     
     if (action === 'getOrders') {
       // Siparişleri getir
-      return getOrders();
+      return getOrders(e.parameter.customerName);
     }
     
     if (action === 'getPendingCustomers') {
@@ -203,7 +203,7 @@ function doGet(e) {
   }
 }
 
-function getOrders() {
+function getOrders(customerName = null) {
   try {
     const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
     const data = sheet.getDataRange().getValues();
@@ -219,7 +219,7 @@ function getOrders() {
     }
     
     // Verileri işle (başlık satırını atla)
-    const orders = data.slice(1).map(row => ({
+    let orders = data.slice(1).map(row => ({
       tarih: row[0] || '',
       masaAdi: row[1] || '',
       urun: row[2] || '',
@@ -228,6 +228,13 @@ function getOrders() {
       toplamFiyat: row[5] || 0,
       ekleyen: row[6] || ''
     }));
+    
+    // Eğer müşteri adı belirtilmişse filtrele
+    if (customerName) {
+      orders = orders.filter(order => 
+        order.masaAdi && order.masaAdi.toLowerCase().includes(customerName.toLowerCase())
+      );
+    }
     
     return ContentService
       .createTextOutput(JSON.stringify({ 

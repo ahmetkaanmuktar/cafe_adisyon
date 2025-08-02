@@ -646,7 +646,7 @@
         };
 
         // Google Sheets Web App URL'i
-        const GOOGLE_SHEETS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
 
         // Global değişkenler
         let masalar = [];
@@ -692,23 +692,30 @@
                     // Demo veriler
                     allOrders = [
                         {
-                            masaAdi: 'Ahmet',
+                            masaAdi: 'Ahmet Bey',
                             urun: '🫖 Çay',
                             toplamFiyat: 15,
                             ekleyen: 'Müşteri Ekledi',
                             tarih: new Date().toLocaleString('tr-TR')
                         },
                         {
-                            masaAdi: 'Mehmet',
+                            masaAdi: 'Mehmet Yılmaz',
                             urun: '🥪 Dana Sucuklu Tost (Tam)',
                             toplamFiyat: 150,
                             ekleyen: 'Müşteri Ekledi',
                             tarih: new Date().toLocaleString('tr-TR')
                         },
                         {
-                            masaAdi: 'Admin Masası',
+                            masaAdi: 'Fatma Hanım',
                             urun: '🥤 Fanta Kola',
                             toplamFiyat: 40,
+                            ekleyen: 'Müşteri Ekledi',
+                            tarih: new Date().toLocaleString('tr-TR')
+                        },
+                        {
+                            masaAdi: 'Admin Masası',
+                            urun: '🥤 Meyveli Soda',
+                            toplamFiyat: 20,
                             ekleyen: 'İşletme Sahibi Ekledi',
                             tarih: new Date().toLocaleString('tr-TR')
                         }
@@ -726,6 +733,13 @@
                         masaAdi: 'Demo Müşteri',
                         urun: '🫖 Çay',
                         toplamFiyat: 7.5,
+                        ekleyen: 'Müşteri Ekledi',
+                        tarih: new Date().toLocaleString('tr-TR')
+                    },
+                    {
+                        masaAdi: 'Test Müşteri',
+                        urun: '🥪 Dana Sucuklu Tost (Yarım)',
+                        toplamFiyat: 75,
                         ekleyen: 'Müşteri Ekledi',
                         tarih: new Date().toLocaleString('tr-TR')
                     }
@@ -845,9 +859,12 @@
                 // Toplam fiyatı sayıya çevir
                 const toplamFiyat = parseFloat(order.toplamFiyat) || 0;
                 
+                // Müşteri adını düzgün göster
+                const customerName = order.masaAdi || 'Bilinmeyen';
+                
                 return `
                     <tr>
-                        <td><strong>${order.masaAdi || 'Bilinmeyen'}</strong></td>
+                        <td><strong>${customerName}</strong></td>
                         <td>${order.urun || 'Bilinmeyen'}</td>
                         <td><strong>${toplamFiyat.toFixed(2)} TL</strong></td>
                         <td>
