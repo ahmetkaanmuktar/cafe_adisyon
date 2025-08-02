@@ -295,17 +295,16 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: bold;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
 
         .refresh-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
 
         .orders-table {
@@ -373,6 +372,125 @@
             text-align: center;
             font-weight: bold;
             display: none;
+        }
+
+        .pending-customers-section {
+            background: #f8f9fa;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .pending-customers-section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .pending-customers-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .pending-customers-table th,
+        .pending-customers-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .pending-customers-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: bold;
+        }
+
+        .pending-customers-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .approval-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .approve-btn {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .approve-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+        }
+
+        .reject-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .reject-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .refresh-pending-btn {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .refresh-pending-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -449,6 +567,26 @@
                     </thead>
                     <tbody id="ordersTableBody">
                         <!-- Siparişler buraya eklenecek -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bekleyen Müşteriler -->
+            <div class="admin-section pending-customers-section">
+                <h2>⏳ Bekleyen Müşteri Onayları</h2>
+                <button onclick="fetchPendingCustomers()" class="refresh-pending-btn">🔄 Bekleyen Müşterileri Yenile</button>
+                <table class="pending-customers-table">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Müşteri Adı</th>
+                            <th>Durum</th>
+                            <th>Onay Tarihi</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingCustomersTableBody">
+                        <!-- Bekleyen müşteriler buraya eklenecek -->
                     </tbody>
                 </table>
             </div>
@@ -673,11 +811,154 @@
             document.getElementById('masaForm').reset();
         });
 
+        // Bekleyen müşterileri Google Sheets'ten çek
+        async function fetchPendingCustomers() {
+            try {
+                const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getPendingCustomers`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.success && data.pendingCustomers) {
+                    displayPendingCustomers(data.pendingCustomers);
+                    showMessage('success', '✅ Bekleyen müşteriler güncellendi!');
+                } else {
+                    console.log('Demo mode - Örnek bekleyen müşteriler gösteriliyor');
+                    // Demo veriler
+                    const demoPendingCustomers = [
+                        {
+                            tarih: new Date().toLocaleString('tr-TR'),
+                            customerName: 'Ahmet Yılmaz',
+                            status: 'Bekliyor',
+                            approvalDate: ''
+                        },
+                        {
+                            tarih: new Date().toLocaleString('tr-TR'),
+                            customerName: 'Fatma Demir',
+                            status: 'Bekliyor',
+                            approvalDate: ''
+                        }
+                    ];
+                    displayPendingCustomers(demoPendingCustomers);
+                }
+            } catch (error) {
+                console.error('Bekleyen müşteriler çekilirken hata:', error);
+                showMessage('error', '❌ Bekleyen müşteriler yüklenirken hata oluştu.');
+            }
+        }
+
+        // Bekleyen müşterileri tabloda göster
+        function displayPendingCustomers(pendingCustomers) {
+            const tbody = document.getElementById('pendingCustomersTableBody');
+            tbody.innerHTML = '';
+            
+            if (pendingCustomers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px; color: #6c757d;">Bekleyen müşteri bulunmuyor</td></tr>';
+                return;
+            }
+            
+            pendingCustomers.forEach(customer => {
+                const row = document.createElement('tr');
+                
+                const statusClass = customer.status === 'Bekliyor' ? 'status-pending' : 
+                                  customer.status === 'Onaylandı' ? 'status-approved' : 'status-rejected';
+                
+                const approvalButtons = customer.status === 'Bekliyor' ? 
+                    `<div class="approval-buttons">
+                        <button class="approve-btn" onclick="approveCustomer('${customer.customerName}')">✅ Onayla</button>
+                        <button class="reject-btn" onclick="rejectCustomer('${customer.customerName}')">❌ Reddet</button>
+                    </div>` : 
+                    `<span class="status-badge ${statusClass}">${customer.status}</span>`;
+                
+                row.innerHTML = `
+                    <td>${customer.tarih}</td>
+                    <td><strong>${customer.customerName}</strong></td>
+                    <td><span class="status-badge ${statusClass}">${customer.status}</span></td>
+                    <td>${customer.approvalDate || '-'}</td>
+                    <td>${approvalButtons}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Müşteriyi onayla
+        async function approveCustomer(customerName) {
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'approveCustomer',
+                        customerName: customerName,
+                        approved: true
+                    }),
+                    mode: 'cors'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('success', `✅ ${customerName} onaylandı!`);
+                    // Bekleyen müşterileri yenile
+                    setTimeout(() => {
+                        fetchPendingCustomers();
+                    }, 1000);
+                } else {
+                    showMessage('error', result.message || '❌ Onay işlemi başarısız.');
+                }
+            } catch (error) {
+                console.error('Onay hatası:', error);
+                showMessage('error', '❌ Onay işlemi sırasında hata oluştu.');
+            }
+        }
+
+        // Müşteriyi reddet
+        async function rejectCustomer(customerName) {
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'approveCustomer',
+                        customerName: customerName,
+                        approved: false
+                    }),
+                    mode: 'cors'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('success', `❌ ${customerName} reddedildi.`);
+                    // Bekleyen müşterileri yenile
+                    setTimeout(() => {
+                        fetchPendingCustomers();
+                    }, 1000);
+                } else {
+                    showMessage('error', result.message || '❌ Red işlemi başarısız.');
+                }
+            } catch (error) {
+                console.error('Red hatası:', error);
+                showMessage('error', '❌ Red işlemi sırasında hata oluştu.');
+            }
+        }
+
         // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', function() {
             loadMasalar();
             displayMasalar();
             fetchOrdersFromGoogleSheets(); // Siparişleri Google Sheets'ten çek
+            fetchPendingCustomers(); // Bekleyen müşterileri çek
         });
     </script>
 </body>

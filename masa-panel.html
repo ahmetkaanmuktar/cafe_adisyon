@@ -98,93 +98,163 @@
             position: relative;
             z-index: 1;
             font-weight: 600;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
         }
 
         .form-container {
             padding: 30px;
         }
 
-        .customer-input {
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
-            padding: 25px;
-            border-radius: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            box-shadow: 
-                0 10px 30px rgba(116, 185, 255, 0.3),
-                inset 0 1px 0 rgba(255,255,255,0.2);
-            position: relative;
-            overflow: hidden;
+        .approval-section {
+            text-align: center;
             margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 20px;
+            border: 2px solid #dee2e6;
+        }
+
+        .approval-section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .approval-section p {
+            color: #6c757d;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .customer-input {
+            margin-bottom: 25px;
+            position: relative;
         }
 
         .customer-input::before {
-            content: '';
+            content: '👤';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+            z-index: 2;
         }
 
         .customer-input label {
             display: block;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: white;
-            font-size: 1.4em;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 1;
+            margin-bottom: 10px;
+            color: #495057;
+            font-weight: 600;
+            font-size: 1.1em;
         }
 
         .customer-input input {
             width: 100%;
-            padding: 18px;
-            border: 3px solid #e0e0e0;
-            border-radius: 15px;
-            font-size: 1.2em;
-            font-weight: 500;
-            text-align: center;
+            padding: 15px 15px 15px 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.1em;
             transition: all 0.3s ease;
             background: white;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-            position: relative;
-            z-index: 1;
         }
 
         .customer-input input:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
             transform: translateY(-2px);
+        }
+
+        .approval-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .approval-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .approval-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .order-section {
+            display: none;
+        }
+
+        .order-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .products-section {
+            margin-bottom: 30px;
         }
 
         .products-section h2 {
             color: #333;
             margin-bottom: 20px;
+            font-size: 1.8em;
             text-align: center;
-            font-size: 1.5em;
         }
 
         .product-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: linear-gradient(135deg, #ffffff, #f8f9fa);
-            margin-bottom: 20px;
-            padding: 25px;
-            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             border: 2px solid transparent;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
@@ -196,7 +266,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
             transition: left 0.5s;
         }
 
@@ -405,98 +475,30 @@
             font-weight: bold;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .container {
-                margin: 0;
-                border-radius: 15px;
-                max-width: 100%;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .header p {
-                font-size: 1em;
-            }
-            
-            .form-container {
-                padding: 20px;
-            }
-            
-            .masa-selection {
-                padding: 20px;
-                margin-bottom: 25px;
-            }
-            
-            .masa-selection label {
-                font-size: 1.1em;
-            }
-            
-            .masa-selection select {
-                padding: 15px;
-                font-size: 1.1em;
-            }
-            
-            .product-item {
-                flex-direction: column;
-                text-align: center;
-                gap: 15px;
-                padding: 15px;
-            }
-            
-            .product-info {
-                justify-content: center;
-            }
-            
-            .product-emoji {
-                font-size: 2.5em;
-            }
-            
-            .product-details h3 {
-                font-size: 1.3em;
-                margin-bottom: 8px;
-            }
-            
-            .product-price {
-                font-size: 1.2em;
-            }
-            
-            .quantity-input {
-                justify-content: center;
-            }
-            
-            .quantity-input button {
-                width: 45px;
-                height: 45px;
-                font-size: 1.3em;
-            }
-            
-            .quantity-input input {
-                width: 70px;
-                font-size: 1.2em;
-            }
-            
-            .total-section {
-                padding: 25px;
-                margin: 25px 0;
-            }
-            
-            .total-amount {
-                font-size: 2.2em;
-            }
-            
-            .submit-btn {
-                padding: 18px;
-                font-size: 1.2em;
-            }
+        .check-status-btn {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
         }
 
-        @media (max-width: 480px) {
+        .check-status-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(243, 156, 18, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 20px;
+            }
+            
             .header {
                 padding: 25px 15px;
             }
@@ -509,8 +511,8 @@
                 padding: 15px;
             }
             
-            .masa-selection {
-                padding: 15px;
+            .approval-section {
+                padding: 20px;
             }
             
             .product-item {
@@ -548,164 +550,183 @@
                 ❌ Bir hata oluştu. Lütfen tekrar deneyin.
             </div>
             
-            <form id="orderForm">
+            <!-- Onay Bölümü -->
+            <div class="approval-section" id="approvalSection">
+                <h2>🔐 Müşteri Onayı</h2>
+                <p>Ürün siparişi verebilmek için önce admin onayı almanız gerekiyor.</p>
+                
                 <div class="customer-input">
                     <label for="customerName">👤 Müşteri Adınız:</label>
                     <input type="text" id="customerName" placeholder="Adınızı yazın..." required>
                 </div>
                 
-                <div class="products-section">
-                    <h2>🍽️ Ürünler</h2>
-                    
-                    <div class="product-item">
-                        <div class="product-info">
-                            <span class="product-emoji">🫖</span>
-                            <div class="product-details">
-                                <h3>Çay</h3>
-                                <div class="product-price">7.5 TL</div>
-                            </div>
-                        </div>
-                        <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('cay', -1)">-</button>
-                            <input type="number" id="cay" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('cay', 1)">+</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item">
-                        <div class="product-info">
-                            <span class="product-emoji">🥤</span>
-                            <div class="product-details">
-                                <h3>Meyveli Soda</h3>
-                                <div class="product-price">20 TL</div>
-                            </div>
-                        </div>
-                        <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('meyveliSoda', -1)">-</button>
-                            <input type="number" id="meyveliSoda" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('meyveliSoda', 1)">+</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item">
-                        <div class="product-info">
-                            <span class="product-emoji">💧</span>
-                            <div class="product-details">
-                                <h3>Su</h3>
-                                <div class="product-price">7.5 TL</div>
-                            </div>
-                        </div>
-                        <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('su', -1)">-</button>
-                            <input type="number" id="su" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('su', 1)">+</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item">
-                        <div class="product-info">
-                            <span class="product-emoji">🚰</span>
-                            <div class="product-details">
-                                <h3>Büyük Su</h3>
-                                <div class="product-price">20 TL</div>
-                            </div>
-                        </div>
-                        <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('buyukSu', -1)">-</button>
-                            <input type="number" id="buyukSu" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('buyukSu', 1)">+</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item">
-                        <div class="product-info">
-                            <span class="product-emoji">🥤</span>
-                            <div class="product-details">
-                                <h3>Sade Soda</h3>
-                                <div class="product-price">15 TL</div>
-                            </div>
-                        </div>
-                        <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('sadeSoda', -1)">-</button>
-                            <input type="number" id="sadeSoda" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('sadeSoda', 1)">+</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item">
-                        <div class="product-info">
-                            <span class="product-emoji">🥪</span>
-                            <div class="product-details">
-                                <h3>Dana Sucuklu Tost (Yarım)</h3>
-                                <div class="product-price">75 TL</div>
-                            </div>
-                        </div>
-                        <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('danaTostYarim', -1)">-</button>
-                            <input type="number" id="danaTostYarim" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('danaTostYarim', 1)">+</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item">
-                        <div class="product-info">
-                            <span class="product-emoji">🥪🧀</span>
-                            <div class="product-details">
-                                <h3>Dana Sucuklu Tost (Tam)</h3>
-                                <div class="product-price">150 TL</div>
-                            </div>
-                        </div>
-                        <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('danaTostTam', -1)">-</button>
-                            <input type="number" id="danaTostTam" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('danaTostTam', 1)">+</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item">
-                        <div class="product-info">
-                            <span class="product-emoji">🥤</span>
-                            <div class="product-details">
-                                <h3>Fanta Kola</h3>
-                                <div class="product-price">40 TL</div>
-                            </div>
-                        </div>
-                        <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('fantaKola', -1)">-</button>
-                            <input type="number" id="fantaKola" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('fantaKola', 1)">+</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-item">
-                        <div class="product-info">
-                            <span class="product-emoji">🥤</span>
-                            <div class="product-details">
-                                <h3>Ankara Gazoz</h3>
-                                <div class="product-price">30 TL</div>
-                            </div>
-                        </div>
-                        <div class="quantity-input">
-                            <button type="button" onclick="changeQuantity('ankaraGazoz', -1)">-</button>
-                            <input type="number" id="ankaraGazoz" min="0" value="0" readonly>
-                            <button type="button" onclick="changeQuantity('ankaraGazoz', 1)">+</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="total-section">
-                    <div class="total-amount" id="totalAmount">0 TL</div>
-                    <p>Toplam Tutar</p>
-                </div>
-                
-                <div class="loading" id="loading">
-                    <p>⏳ Sipariş kaydediliyor...</p>
-                </div>
-                
-                <button type="submit" class="submit-btn" id="submitBtn">
-                    🚀 Siparişi Kaydet
+                <button type="button" class="approval-btn" id="requestApprovalBtn" onclick="requestApproval()">
+                    📤 Onay Talebi Gönder
                 </button>
-            </form>
+                
+                <div id="statusMessage" class="status-message" style="display: none;"></div>
+                
+                <button type="button" class="check-status-btn" id="checkStatusBtn" onclick="checkCustomerStatus()" style="display: none;">
+                    🔄 Durumu Kontrol Et
+                </button>
+            </div>
+            
+            <!-- Sipariş Bölümü -->
+            <div class="order-section" id="orderSection">
+                <form id="orderForm">
+                    <div class="products-section">
+                        <h2>🍽️ Ürünler</h2>
+                        
+                        <div class="product-item">
+                            <div class="product-info">
+                                <span class="product-emoji">🫖</span>
+                                <div class="product-details">
+                                    <h3>Çay</h3>
+                                    <div class="product-price">7.5 TL</div>
+                                </div>
+                            </div>
+                            <div class="quantity-input">
+                                <button type="button" onclick="changeQuantity('cay', -1)">-</button>
+                                <input type="number" id="cay" min="0" value="0" readonly>
+                                <button type="button" onclick="changeQuantity('cay', 1)">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <div class="product-info">
+                                <span class="product-emoji">🥤</span>
+                                <div class="product-details">
+                                    <h3>Meyveli Soda</h3>
+                                    <div class="product-price">20 TL</div>
+                                </div>
+                            </div>
+                            <div class="quantity-input">
+                                <button type="button" onclick="changeQuantity('meyveliSoda', -1)">-</button>
+                                <input type="number" id="meyveliSoda" min="0" value="0" readonly>
+                                <button type="button" onclick="changeQuantity('meyveliSoda', 1)">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <div class="product-info">
+                                <span class="product-emoji">💧</span>
+                                <div class="product-details">
+                                    <h3>Su</h3>
+                                    <div class="product-price">7.5 TL</div>
+                                </div>
+                            </div>
+                            <div class="quantity-input">
+                                <button type="button" onclick="changeQuantity('su', -1)">-</button>
+                                <input type="number" id="su" min="0" value="0" readonly>
+                                <button type="button" onclick="changeQuantity('su', 1)">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <div class="product-info">
+                                <span class="product-emoji">🚰</span>
+                                <div class="product-details">
+                                    <h3>Büyük Su</h3>
+                                    <div class="product-price">20 TL</div>
+                                </div>
+                            </div>
+                            <div class="quantity-input">
+                                <button type="button" onclick="changeQuantity('buyukSu', -1)">-</button>
+                                <input type="number" id="buyukSu" min="0" value="0" readonly>
+                                <button type="button" onclick="changeQuantity('buyukSu', 1)">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <div class="product-info">
+                                <span class="product-emoji">🥤</span>
+                                <div class="product-details">
+                                    <h3>Sade Soda</h3>
+                                    <div class="product-price">15 TL</div>
+                                </div>
+                            </div>
+                            <div class="quantity-input">
+                                <button type="button" onclick="changeQuantity('sadeSoda', -1)">-</button>
+                                <input type="number" id="sadeSoda" min="0" value="0" readonly>
+                                <button type="button" onclick="changeQuantity('sadeSoda', 1)">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <div class="product-info">
+                                <span class="product-emoji">🥪</span>
+                                <div class="product-details">
+                                    <h3>Dana Sucuklu Tost (Yarım)</h3>
+                                    <div class="product-price">75 TL</div>
+                                </div>
+                            </div>
+                            <div class="quantity-input">
+                                <button type="button" onclick="changeQuantity('danaTostYarim', -1)">-</button>
+                                <input type="number" id="danaTostYarim" min="0" value="0" readonly>
+                                <button type="button" onclick="changeQuantity('danaTostYarim', 1)">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <div class="product-info">
+                                <span class="product-emoji">🥪🧀</span>
+                                <div class="product-details">
+                                    <h3>Dana Sucuklu Tost (Tam)</h3>
+                                    <div class="product-price">150 TL</div>
+                                </div>
+                            </div>
+                            <div class="quantity-input">
+                                <button type="button" onclick="changeQuantity('danaTostTam', -1)">-</button>
+                                <input type="number" id="danaTostTam" min="0" value="0" readonly>
+                                <button type="button" onclick="changeQuantity('danaTostTam', 1)">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <div class="product-info">
+                                <span class="product-emoji">🥤</span>
+                                <div class="product-details">
+                                    <h3>Fanta Kola</h3>
+                                    <div class="product-price">40 TL</div>
+                                </div>
+                            </div>
+                            <div class="quantity-input">
+                                <button type="button" onclick="changeQuantity('fantaKola', -1)">-</button>
+                                <input type="number" id="fantaKola" min="0" value="0" readonly>
+                                <button type="button" onclick="changeQuantity('fantaKola', 1)">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="product-item">
+                            <div class="product-info">
+                                <span class="product-emoji">🥤</span>
+                                <div class="product-details">
+                                    <h3>Ankara Gazoz</h3>
+                                    <div class="product-price">30 TL</div>
+                                </div>
+                            </div>
+                            <div class="quantity-input">
+                                <button type="button" onclick="changeQuantity('ankaraGazoz', -1)">-</button>
+                                <input type="number" id="ankaraGazoz" min="0" value="0" readonly>
+                                <button type="button" onclick="changeQuantity('ankaraGazoz', 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="total-section">
+                        <div class="total-amount" id="totalAmount">0 TL</div>
+                        <p>Toplam Tutar</p>
+                    </div>
+                    
+                    <div class="loading" id="loading">
+                        <p>⏳ Sipariş kaydediliyor...</p>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        🚀 Siparişi Kaydet
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -725,6 +746,9 @@
 
         // Google Sheets Web App URL'i
         const GOOGLE_SHEETS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+        let currentCustomerName = '';
+        let customerApproved = false;
 
         // Müşteri adını localStorage'da sakla
         function saveCustomerName(name) {
@@ -759,7 +783,125 @@
             return null;
         }
 
+        // Onay talebi gönder
+        async function requestApproval() {
+            const customerName = document.getElementById('customerName').value.trim();
+            if (!customerName) {
+                showMessage('error', '❌ Lütfen adınızı yazın!');
+                return;
+            }
+
+            const requestBtn = document.getElementById('requestApprovalBtn');
+            requestBtn.disabled = true;
+            requestBtn.textContent = '⏳ Gönderiliyor...';
+
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'requestApproval',
+                        customerName: customerName
+                    }),
+                    mode: 'cors'
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentCustomerName = customerName;
+                    saveCustomerName(customerName);
+                    showStatusMessage('Onay talebiniz gönderildi. Admin onayı bekleniyor...', 'pending');
+                    document.getElementById('checkStatusBtn').style.display = 'inline-block';
+                    requestBtn.style.display = 'none';
+                } else {
+                    showMessage('error', result.message || '❌ Onay talebi gönderilemedi.');
+                    requestBtn.disabled = false;
+                    requestBtn.textContent = '📤 Onay Talebi Gönder';
+                }
+            } catch (error) {
+                console.error('Onay talebi hatası:', error);
+                showMessage('error', '❌ Bağlantı hatası. Lütfen tekrar deneyin.');
+                requestBtn.disabled = false;
+                requestBtn.textContent = '📤 Onay Talebi Gönder';
+            }
+        }
+
+        // Müşteri durumunu kontrol et
+        async function checkCustomerStatus() {
+            if (!currentCustomerName) {
+                const savedName = loadCustomerName();
+                if (savedName) {
+                    currentCustomerName = savedName;
+                    document.getElementById('customerName').value = savedName;
+                } else {
+                    showMessage('error', '❌ Müşteri adı bulunamadı.');
+                    return;
+                }
+            }
+
+            const checkBtn = document.getElementById('checkStatusBtn');
+            checkBtn.disabled = true;
+            checkBtn.textContent = '⏳ Kontrol ediliyor...';
+
+            try {
+                const response = await fetch(`${GOOGLE_SHEETS_URL}?action=checkCustomerStatus&customerName=${encodeURIComponent(currentCustomerName)}`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.status === 'Onaylandı') {
+                        customerApproved = true;
+                        showStatusMessage('✅ Onaylandınız! Artık sipariş verebilirsiniz.', 'approved');
+                        setTimeout(() => {
+                            document.getElementById('approvalSection').style.display = 'none';
+                            document.getElementById('orderSection').classList.add('show');
+                        }, 2000);
+                    } else if (result.status === 'Reddedildi') {
+                        showStatusMessage('❌ Onay talebiniz reddedildi.', 'rejected');
+                        checkBtn.disabled = false;
+                        checkBtn.textContent = '🔄 Durumu Kontrol Et';
+                    } else if (result.status === 'Bekliyor') {
+                        showStatusMessage('⏳ Onay talebiniz hala bekleniyor...', 'pending');
+                        checkBtn.disabled = false;
+                        checkBtn.textContent = '🔄 Durumu Kontrol Et';
+                    } else {
+                        showStatusMessage('❓ Durum belirsiz. Lütfen tekrar deneyin.', 'pending');
+                        checkBtn.disabled = false;
+                        checkBtn.textContent = '🔄 Durumu Kontrol Et';
+                    }
+                } else {
+                    showMessage('error', '❌ Durum kontrol edilemedi.');
+                    checkBtn.disabled = false;
+                    checkBtn.textContent = '🔄 Durumu Kontrol Et';
+                }
+            } catch (error) {
+                console.error('Durum kontrol hatası:', error);
+                showMessage('error', '❌ Bağlantı hatası. Lütfen tekrar deneyin.');
+                checkBtn.disabled = false;
+                checkBtn.textContent = '🔄 Durumu Kontrol Et';
+            }
+        }
+
+        // Durum mesajını göster
+        function showStatusMessage(message, type) {
+            const statusMsg = document.getElementById('statusMessage');
+            statusMsg.textContent = message;
+            statusMsg.className = `status-message status-${type}`;
+            statusMsg.style.display = 'block';
+        }
+
         function changeQuantity(productId, change) {
+            if (!customerApproved) {
+                showMessage('error', '❌ Henüz onaylanmadınız!');
+                return;
+            }
+
             const input = document.getElementById(productId);
             const currentValue = parseInt(input.value) || 0;
             const newValue = Math.max(0, currentValue + change);
@@ -810,9 +952,8 @@
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const customerName = document.getElementById('customerName').value.trim();
-            if (!customerName) {
-                showMessage('error', '❌ Lütfen adınızı yazın!');
+            if (!customerApproved) {
+                showMessage('error', '❌ Henüz onaylanmadınız!');
                 return;
             }
             
@@ -826,7 +967,7 @@
                     hasItems = true;
                     orderItems.push({
                         tarih: new Date().toLocaleString('tr-TR'),
-                        masaAdi: customerName,
+                        masaAdi: currentCustomerName,
                         urun: products[productId].name,
                         adet: quantity,
                         birimFiyat: products[productId].price,
@@ -848,8 +989,6 @@
             try {
                 // Google Sheets'e gönder
                 await sendToGoogleSheets(orderItems);
-                // Müşteri adını kaydet
-                saveCustomerName(customerName);
                 showMessage('success', '✅ Siparişiniz başarıyla kaydedildi!');
                 resetForm();
             } catch (error) {
@@ -915,6 +1054,11 @@
             const savedCustomerName = loadCustomerName();
             if (savedCustomerName) {
                 document.getElementById('customerName').value = savedCustomerName;
+                currentCustomerName = savedCustomerName;
+                // Kaydedilmiş müşteri varsa durumunu kontrol et
+                setTimeout(() => {
+                    checkCustomerStatus();
+                }, 1000);
             }
             updateTotal();
         });

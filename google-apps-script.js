@@ -2,12 +2,134 @@
 // Deploy as web app with access: Anyone
 
 const SHEET_ID = '1QjmdQKijrmEus1w0MTTn9xtQHOy57UwcVlj5_FQeIGw';
+const PENDING_CUSTOMERS_SHEET_NAME = 'Bekleyen Müşteriler';
 
 function doPost(e) {
   try {
     // Parse the incoming data
     const data = JSON.parse(e.postData.contents);
     
+    // Check if this is a customer approval request
+    if (data.action === 'requestApproval') {
+      return handleCustomerApprovalRequest(data);
+    }
+    
+    // Check if this is an approval response
+    if (data.action === 'approveCustomer') {
+      return handleCustomerApproval(data);
+    }
+    
+    // Regular order submission
+    return handleOrderSubmission(data);
+    
+  } catch (error) {
+    console.error('Hata detayı:', error.toString());
+    
+    // Return error response
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: error.toString(),
+        message: 'Veri kaydedilirken hata oluştu'
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function handleCustomerApprovalRequest(data) {
+  try {
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+    let pendingSheet = spreadsheet.getSheetByName(PENDING_CUSTOMERS_SHEET_NAME);
+    
+    // If sheet doesn't exist, create it
+    if (!pendingSheet) {
+      pendingSheet = spreadsheet.insertSheet(PENDING_CUSTOMERS_SHEET_NAME);
+      pendingSheet.appendRow(['Tarih', 'Müşteri Adı', 'Durum', 'Onay Tarihi']);
+    }
+    
+    const customerName = data.customerName || 'Bilinmeyen';
+    const currentTime = new Date();
+    
+    // Check if customer already exists
+    const existingData = pendingSheet.getDataRange().getValues();
+    const customerExists = existingData.slice(1).some(row => 
+      row[1] === customerName && row[2] === 'Bekliyor'
+    );
+    
+    if (customerExists) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ 
+          success: false, 
+          message: 'Bu müşteri adı zaten onay bekliyor' 
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // Add new customer request
+    pendingSheet.appendRow([currentTime, customerName, 'Bekliyor', '']);
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: true, 
+        message: 'Onay talebiniz gönderildi. Admin onayı bekleniyor.' 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    console.error('Müşteri onay talebi hatası:', error.toString());
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: error.toString() 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function handleCustomerApproval(data) {
+  try {
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+    const pendingSheet = spreadsheet.getSheetByName(PENDING_CUSTOMERS_SHEET_NAME);
+    
+    if (!pendingSheet) {
+      throw new Error('Bekleyen müşteriler sayfası bulunamadı');
+    }
+    
+    const customerName = data.customerName;
+    const isApproved = data.approved;
+    const currentTime = new Date();
+    
+    // Find and update the customer status
+    const existingData = pendingSheet.getDataRange().getValues();
+    for (let i = 1; i < existingData.length; i++) {
+      if (existingData[i][1] === customerName && existingData[i][2] === 'Bekliyor') {
+        const status = isApproved ? 'Onaylandı' : 'Reddedildi';
+        pendingSheet.getRange(i + 1, 3).setValue(status);
+        pendingSheet.getRange(i + 1, 4).setValue(currentTime);
+        break;
+      }
+    }
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: true, 
+        message: `Müşteri ${isApproved ? 'onaylandı' : 'reddedildi'}` 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    console.error('Müşteri onay hatası:', error.toString());
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: error.toString() 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function handleOrderSubmission(data) {
+  try {
     // Get the active sheet
     const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
     
@@ -31,9 +153,7 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
       
   } catch (error) {
-    console.error('Hata detayı:', error.toString());
-    
-    // Return error response
+    console.error('Sipariş kaydetme hatası:', error.toString());
     return ContentService
       .createTextOutput(JSON.stringify({ 
         success: false, 
@@ -52,6 +172,16 @@ function doGet(e) {
     if (action === 'getOrders') {
       // Siparişleri getir
       return getOrders();
+    }
+    
+    if (action === 'getPendingCustomers') {
+      // Bekleyen müşterileri getir
+      return getPendingCustomers();
+    }
+    
+    if (action === 'checkCustomerStatus') {
+      // Müşteri durumunu kontrol et
+      return checkCustomerStatus(e.parameter.customerName);
     }
     
     // Varsayılan yanıt
@@ -108,6 +238,103 @@ function getOrders() {
       
   } catch (error) {
     console.error('Siparişler getirilirken hata:', error.toString());
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: error.toString() 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function getPendingCustomers() {
+  try {
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+    const pendingSheet = spreadsheet.getSheetByName(PENDING_CUSTOMERS_SHEET_NAME);
+    
+    if (!pendingSheet) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ 
+          success: true, 
+          pendingCustomers: [] 
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    const data = pendingSheet.getDataRange().getValues();
+    
+    if (data.length <= 1) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ 
+          success: true, 
+          pendingCustomers: [] 
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    const pendingCustomers = data.slice(1).map(row => ({
+      tarih: row[0] || '',
+      customerName: row[1] || '',
+      status: row[2] || '',
+      approvalDate: row[3] || ''
+    }));
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: true, 
+        pendingCustomers: pendingCustomers 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    console.error('Bekleyen müşteriler getirilirken hata:', error.toString());
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: error.toString() 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function checkCustomerStatus(customerName) {
+  try {
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+    const pendingSheet = spreadsheet.getSheetByName(PENDING_CUSTOMERS_SHEET_NAME);
+    
+    if (!pendingSheet) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ 
+          success: true, 
+          status: 'not_found' 
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    const data = pendingSheet.getDataRange().getValues();
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][1] === customerName) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ 
+            success: true, 
+            status: data[i][2] || 'unknown',
+            requestDate: data[i][0] || '',
+            approvalDate: data[i][3] || ''
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: true, 
+        status: 'not_found' 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    console.error('Müşteri durumu kontrol edilirken hata:', error.toString());
     return ContentService
       .createTextOutput(JSON.stringify({ 
         success: false, 
