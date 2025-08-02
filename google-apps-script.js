@@ -1,76 +1,67 @@
-// Google Apps Script kodu - Google Sheets'e iç tüketim verilerini kaydetmek için
-// Bu kodu Google Apps Script'te yeni bir proje olarak oluşturun
+// Google Apps Script for Cafe Adisyon System
+// Deploy as web app with access: Anyone
+
+const SHEET_ID = '1QjmdQKijrmEus1w0MTTn9xtQHOy57UwcVlj5_FQeIGw';
 
 function doPost(e) {
   try {
-    // CORS headers ekle
-    const output = ContentService.createTextOutput();
-    
-    // Gelen JSON verisini parse et
+    // Parse the incoming data
     const data = JSON.parse(e.postData.contents);
     
-    // Google Sheets ID'si - Kendi sheets ID'nizi buraya yazın
-    const SHEET_ID = '1QjmdQKijrmEus1w0MTTn9xtQHOy57UwcVlj5_FQeIGw';
+    // Get the active sheet
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
     
-    // Spreadsheet'i aç
-    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+    // Prepare the row data with new 'ekleyen' field
+    const rowData = [
+      new Date(), // Tarih
+      data.masaAdi || data.musteriAdi || 'Bilinmeyen', // Masa Adı
+      data.urun || 'Bilinmeyen', // Ürün
+      data.adet || 0, // Adet
+      data.birimFiyat || 0, // Birim Fiyat
+      data.toplamFiyat || 0, // Toplam Fiyat
+      data.ekleyen === 'admin' ? 'İşletme Sahibi Ekledi' : 'Müşteri Ekledi' // Ekleyen
+    ];
     
-    // İlk sheet'i al (veya istediğiniz sheet adını yazın)
-    let sheet = spreadsheet.getActiveSheet();
+    // Append the data to the sheet
+    sheet.appendRow(rowData);
     
-    // Eğer sheet boşsa başlıkları ekle
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(['Tarih', 'Müşteri Adı', 'Ürün', 'Adet', 'Birim Fiyat', 'Toplam Fiyat']);
-    }
-    
-    // Yeni satır ekle  
-    sheet.appendRow([
-      data.tarih,
-      data.musteriAdi,  // masaAdi yerine musteriAdi
-      data.urun,
-      data.adet,
-      data.birimFiyat,
-      data.toplamFiyat
-    ]);
-    
-    // Başarılı yanıt döndür
+    // Return success response
     return ContentService
-      .createTextOutput(JSON.stringify({success: true, message: 'Veri başarıyla kaydedildi'}))
+      .createTextOutput(JSON.stringify({ success: true, message: 'Veri başarıyla kaydedildi' }))
       .setMimeType(ContentService.MimeType.JSON);
       
   } catch (error) {
-    // Hata durumunda detaylı log
-    console.error('Google Apps Script Hatası:', error);
+    console.error('Hata detayı:', error.toString());
+    
+    // Return error response
     return ContentService
-      .createTextOutput(JSON.stringify({success: false, error: error.toString(), stack: error.stack}))
+      .createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: error.toString(),
+        message: 'Veri kaydedilirken hata oluştu'
+      }))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
 function doGet(e) {
-  // GET isteklerini de destekle (test için)
   return ContentService
-    .createTextOutput(JSON.stringify({message: 'Mahmud Cafe Sipariş API çalışıyor'}))
+    .createTextOutput(JSON.stringify({ 
+      status: 'API çalışıyor',
+      message: 'Cafe Adisyon API aktif'
+    }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-// Test fonksiyonu - Google Apps Script editöründe test etmek için
-function testFunction() {
-  const testData = {
-    tarih: new Date().toLocaleString('tr-TR'),
-    masaAdi: 'Test Masası',
-    urun: '🫖 Çay',
-    adet: 2,
-    birimFiyat: 7.5,
-    toplamFiyat: 15
-  };
-  
-  const mockEvent = {
-    postData: {
-      contents: JSON.stringify(testData)
-    }
-  };
-  
-  const result = doPost(mockEvent);
-  console.log(result.getContent());
+// Test function to check sheet access
+function testSheetAccess() {
+  try {
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
+    const headers = sheet.getRange(1, 1, 1, 7).getValues()[0];
+    console.log('Mevcut başlıklar:', headers);
+    return true;
+  } catch (error) {
+    console.error('Sheet erişim hatası:', error);
+    return false;
+  }
 }
