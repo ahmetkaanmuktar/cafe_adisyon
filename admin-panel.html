@@ -493,6 +493,35 @@
             box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
         }
 
+        .total-summary {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.3);
+        }
+
+        .total-amount-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .total-label {
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .total-value {
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
         @media (max-width: 768px) {
             .admin-container {
                 padding: 20px;
@@ -555,6 +584,15 @@
                     <h2>📊 Tüm Siparişler</h2>
                     <button onclick="fetchOrdersFromGoogleSheets()" class="refresh-btn">🔄 Siparişleri Yenile</button>
                 </div>
+                
+                <!-- Toplam Tutar Gösterimi -->
+                <div class="total-summary">
+                    <div class="total-amount-display">
+                        <span class="total-label">💰 Toplam Tutar:</span>
+                        <span class="total-value" id="totalAmount">0.00 TL</span>
+                    </div>
+                </div>
+                
                 <table class="orders-table">
                     <thead>
                         <tr>
@@ -617,19 +655,36 @@
         // Google Sheets'ten siparişleri çek
         async function fetchOrdersFromGoogleSheets() {
             try {
+                console.log('Siparişler çekiliyor...');
+                
                 // Google Sheets'ten veri çekmek için Apps Script'e GET isteği gönder
                 const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getOrders`, {
                     method: 'GET',
                     mode: 'cors'
                 });
                 
+                console.log('Response status:', response.status);
+                
                 if (!response.ok) {
                     throw new Error(`HTTP Error: ${response.status}`);
                 }
                 
-                const data = await response.json();
+                const responseText = await response.text();
+                console.log('Response text:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse hatası:', parseError);
+                    throw new Error('Sunucudan geçersiz yanıt alındı');
+                }
+                
+                console.log('Parsed data:', data);
+                
                 if (data.success && data.orders) {
                     allOrders = data.orders;
+                    console.log('Siparişler yüklendi:', allOrders);
                     displayAllOrders();
                     showMessage('success', '✅ Siparişler güncellendi!');
                 } else {
@@ -640,22 +695,42 @@
                             masaAdi: 'Ahmet',
                             urun: '🫖 Çay',
                             toplamFiyat: 15,
-                            ekleyen: 'customer',
+                            ekleyen: 'Müşteri Ekledi',
                             tarih: new Date().toLocaleString('tr-TR')
                         },
                         {
                             masaAdi: 'Mehmet',
                             urun: '🥪 Dana Sucuklu Tost (Tam)',
                             toplamFiyat: 150,
-                            ekleyen: 'customer',
+                            ekleyen: 'Müşteri Ekledi',
+                            tarih: new Date().toLocaleString('tr-TR')
+                        },
+                        {
+                            masaAdi: 'Admin Masası',
+                            urun: '🥤 Fanta Kola',
+                            toplamFiyat: 40,
+                            ekleyen: 'İşletme Sahibi Ekledi',
                             tarih: new Date().toLocaleString('tr-TR')
                         }
                     ];
                     displayAllOrders();
+                    showMessage('info', 'ℹ️ Demo modunda çalışıyor - Örnek veriler gösteriliyor');
                 }
             } catch (error) {
                 console.error('Siparişler çekilirken hata:', error);
-                showMessage('error', '❌ Siparişler yüklenirken hata oluştu.');
+                showMessage('error', `❌ Siparişler yüklenirken hata oluştu: ${error.message}`);
+                
+                // Hata durumunda demo veriler göster
+                allOrders = [
+                    {
+                        masaAdi: 'Demo Müşteri',
+                        urun: '🫖 Çay',
+                        toplamFiyat: 7.5,
+                        ekleyen: 'Müşteri Ekledi',
+                        tarih: new Date().toLocaleString('tr-TR')
+                    }
+                ];
+                displayAllOrders();
             }
         }
 
@@ -754,19 +829,36 @@
             // En yeni siparişlerden başlayarak sırala
             const sortedOrders = allOrders.sort((a, b) => new Date(b.tarih) - new Date(a.tarih));
             
-            tbody.innerHTML = sortedOrders.map(order => `
-                <tr>
-                    <td><strong>${order.masaAdi}</strong></td>
-                    <td>${order.urun}</td>
-                    <td><strong>${order.toplamFiyat} TL</strong></td>
-                    <td>
-                        <span class="user-type ${order.ekleyen === 'admin' ? 'type-admin' : 'type-customer'}">
-                            ${order.ekleyen === 'admin' ? '👑 İşletme Sahibi' : '👤 Müşteri'}
-                        </span>
-                    </td>
-                    <td>${order.tarih}</td>
-                </tr>
-            `).join('');
+            // Toplam tutarı hesapla
+            const totalAmount = sortedOrders.reduce((total, order) => {
+                const amount = parseFloat(order.toplamFiyat) || 0;
+                return total + amount;
+            }, 0);
+            
+            // Toplam tutarı göster
+            const totalDisplay = document.getElementById('totalAmount');
+            if (totalDisplay) {
+                totalDisplay.textContent = `${totalAmount.toFixed(2)} TL`;
+            }
+            
+            tbody.innerHTML = sortedOrders.map(order => {
+                // Toplam fiyatı sayıya çevir
+                const toplamFiyat = parseFloat(order.toplamFiyat) || 0;
+                
+                return `
+                    <tr>
+                        <td><strong>${order.masaAdi || 'Bilinmeyen'}</strong></td>
+                        <td>${order.urun || 'Bilinmeyen'}</td>
+                        <td><strong>${toplamFiyat.toFixed(2)} TL</strong></td>
+                        <td>
+                            <span class="user-type ${order.ekleyen === 'İşletme Sahibi Ekledi' ? 'type-admin' : 'type-customer'}">
+                                ${order.ekleyen === 'İşletme Sahibi Ekledi' ? '👑 İşletme Sahibi' : '👤 Müşteri'}
+                            </span>
+                        </td>
+                        <td>${order.tarih || 'Bilinmeyen'}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // Mesaj göster
@@ -780,6 +872,11 @@
             if (type === 'success') {
                 successMsg.style.display = 'block';
                 successMsg.textContent = message;
+            } else if (type === 'info') {
+                successMsg.style.display = 'block';
+                successMsg.textContent = message;
+                successMsg.style.background = '#d1ecf1';
+                successMsg.style.color = '#0c5460';
             } else {
                 errorMsg.style.display = 'block';
                 errorMsg.textContent = message;
@@ -788,6 +885,9 @@
             setTimeout(() => {
                 successMsg.style.display = 'none';
                 errorMsg.style.display = 'none';
+                // CSS'i sıfırla
+                successMsg.style.background = '';
+                successMsg.style.color = '';
             }, 5000);
         }
 
