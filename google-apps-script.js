@@ -45,12 +45,76 @@ function doPost(e) {
 }
 
 function doGet(e) {
-  return ContentService
-    .createTextOutput(JSON.stringify({ 
-      status: 'API çalışıyor',
-      message: 'Cafe Adisyon API aktif'
-    }))
-    .setMimeType(ContentService.MimeType.JSON);
+  try {
+    // URL parametrelerini kontrol et
+    const action = e.parameter.action;
+    
+    if (action === 'getOrders') {
+      // Siparişleri getir
+      return getOrders();
+    }
+    
+    // Varsayılan yanıt
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        status: 'API çalışıyor',
+        message: 'Cafe Adisyon API aktif'
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    console.error('doGet hatası:', error.toString());
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: error.toString() 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function getOrders() {
+  try {
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
+    const data = sheet.getDataRange().getValues();
+    
+    // İlk satır başlık olduğu için atla
+    if (data.length <= 1) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ 
+          success: true, 
+          orders: [] 
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // Verileri işle (başlık satırını atla)
+    const orders = data.slice(1).map(row => ({
+      tarih: row[0] || '',
+      masaAdi: row[1] || '',
+      urun: row[2] || '',
+      adet: row[3] || 0,
+      birimFiyat: row[4] || 0,
+      toplamFiyat: row[5] || 0,
+      ekleyen: row[6] || ''
+    }));
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: true, 
+        orders: orders 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    console.error('Siparişler getirilirken hata:', error.toString());
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        success: false, 
+        error: error.toString() 
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 // Test function to check sheet access

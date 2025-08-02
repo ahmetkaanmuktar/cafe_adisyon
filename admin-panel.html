@@ -284,6 +284,30 @@
             margin-bottom: 30px;
         }
 
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
         .orders-table {
             width: 100%;
             border-collapse: collapse;
@@ -409,7 +433,10 @@
             
             <!-- Tüm Siparişler -->
             <div class="admin-section all-orders-section">
-                <h2>📊 Tüm Siparişler</h2>
+                <div class="orders-header">
+                    <h2>📊 Tüm Siparişler</h2>
+                    <button onclick="fetchOrdersFromGoogleSheets()" class="refresh-btn">🔄 Siparişleri Yenile</button>
+                </div>
                 <table class="orders-table">
                     <thead>
                         <tr>
@@ -448,6 +475,51 @@
         // Global değişkenler
         let masalar = [];
         let allOrders = [];
+
+        // Google Sheets'ten siparişleri çek
+        async function fetchOrdersFromGoogleSheets() {
+            try {
+                // Google Sheets'ten veri çekmek için Apps Script'e GET isteği gönder
+                const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getOrders`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.success && data.orders) {
+                    allOrders = data.orders;
+                    displayAllOrders();
+                    showMessage('success', '✅ Siparişler güncellendi!');
+                } else {
+                    console.log('Demo mode - Örnek veriler gösteriliyor');
+                    // Demo veriler
+                    allOrders = [
+                        {
+                            masaAdi: 'Ahmet',
+                            urun: '🫖 Çay',
+                            toplamFiyat: 15,
+                            ekleyen: 'customer',
+                            tarih: new Date().toLocaleString('tr-TR')
+                        },
+                        {
+                            masaAdi: 'Mehmet',
+                            urun: '🥪 Dana Sucuklu Tost (Tam)',
+                            toplamFiyat: 150,
+                            ekleyen: 'customer',
+                            tarih: new Date().toLocaleString('tr-TR')
+                        }
+                    ];
+                    displayAllOrders();
+                }
+            } catch (error) {
+                console.error('Siparişler çekilirken hata:', error);
+                showMessage('error', '❌ Siparişler yüklenirken hata oluştu.');
+            }
+        }
 
         // LocalStorage'dan masaları yükle
         function loadMasalar() {
@@ -605,7 +677,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadMasalar();
             displayMasalar();
-            displayAllOrders();
+            fetchOrdersFromGoogleSheets(); // Siparişleri Google Sheets'ten çek
         });
     </script>
 </body>

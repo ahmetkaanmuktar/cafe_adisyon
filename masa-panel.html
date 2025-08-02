@@ -105,7 +105,7 @@
             padding: 30px;
         }
 
-        .masa-selection {
+        .customer-input {
             background: linear-gradient(135deg, #74b9ff, #0984e3);
             padding: 25px;
             border-radius: 20px;
@@ -118,7 +118,7 @@
             margin-bottom: 30px;
         }
 
-        .masa-selection::before {
+        .customer-input::before {
             content: '';
             position: absolute;
             top: -50%;
@@ -134,7 +134,7 @@
             100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
-        .masa-selection label {
+        .customer-input label {
             display: block;
             margin-bottom: 15px;
             font-weight: bold;
@@ -146,7 +146,7 @@
             z-index: 1;
         }
 
-        .masa-selection select {
+        .customer-input input {
             width: 100%;
             padding: 18px;
             border: 3px solid #e0e0e0;
@@ -161,7 +161,7 @@
             z-index: 1;
         }
 
-        .masa-selection select:focus {
+        .customer-input input:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 2px 5px rgba(0,0,0,0.05);
@@ -549,11 +549,9 @@
             </div>
             
             <form id="orderForm">
-                <div class="masa-selection">
-                    <label for="masaSelect">🪑 Masa Seçin:</label>
-                    <select id="masaSelect" required>
-                        <option value="">Masa seçin...</option>
-                    </select>
+                <div class="customer-input">
+                    <label for="customerName">👤 Müşteri Adınız:</label>
+                    <input type="text" id="customerName" placeholder="Adınızı yazın..." required>
                 </div>
                 
                 <div class="products-section">
@@ -728,34 +726,37 @@
         // Google Sheets Web App URL'i
         const GOOGLE_SHEETS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
 
-        // LocalStorage'dan masaları yükle
-        function loadMasalar() {
-            try {
-                const saved = localStorage.getItem('mahmudCafeMasalar');
-                if (saved) {
-                    return JSON.parse(saved);
-                }
-            } catch (error) {
-                console.error('Masalar yüklenirken hata:', error);
-            }
-            return [];
+        // Müşteri adını localStorage'da sakla
+        function saveCustomerName(name) {
+            const expireTime = new Date().getTime() + (12 * 60 * 60 * 1000); // 12 saat
+            const customerData = {
+                name: name,
+                expireTime: expireTime
+            };
+            localStorage.setItem('mahmudCafeCustomer', JSON.stringify(customerData));
         }
 
-        // Masa seçeneklerini doldur
-        function populateMasaSelect() {
-            const masaSelect = document.getElementById('masaSelect');
-            const masalar = loadMasalar();
-            
-            // Mevcut seçenekleri temizle (ilk seçenek hariç)
-            masaSelect.innerHTML = '<option value="">Masa seçin...</option>';
-            
-            // Masaları ekle
-            masalar.forEach(masa => {
-                const option = document.createElement('option');
-                option.value = masa.name;
-                option.textContent = masa.name;
-                masaSelect.appendChild(option);
-            });
+        // Müşteri adını localStorage'dan yükle
+        function loadCustomerName() {
+            try {
+                const savedData = localStorage.getItem('mahmudCafeCustomer');
+                if (savedData) {
+                    const customerData = JSON.parse(savedData);
+                    const now = new Date().getTime();
+                    
+                    // 12 saat geçmişse sil
+                    if (now > customerData.expireTime) {
+                        localStorage.removeItem('mahmudCafeCustomer');
+                        return null;
+                    }
+                    
+                    return customerData.name;
+                }
+            } catch (error) {
+                console.log('Müşteri adı yüklenirken hata:', error);
+                localStorage.removeItem('mahmudCafeCustomer');
+            }
+            return null;
         }
 
         function changeQuantity(productId, change) {
@@ -809,9 +810,9 @@
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const selectedMasa = document.getElementById('masaSelect').value;
-            if (!selectedMasa) {
-                showMessage('error', '❌ Lütfen masa seçin!');
+            const customerName = document.getElementById('customerName').value.trim();
+            if (!customerName) {
+                showMessage('error', '❌ Lütfen adınızı yazın!');
                 return;
             }
             
@@ -825,7 +826,7 @@
                     hasItems = true;
                     orderItems.push({
                         tarih: new Date().toLocaleString('tr-TR'),
-                        masaAdi: selectedMasa,
+                        masaAdi: customerName,
                         urun: products[productId].name,
                         adet: quantity,
                         birimFiyat: products[productId].price,
@@ -847,6 +848,8 @@
             try {
                 // Google Sheets'e gönder
                 await sendToGoogleSheets(orderItems);
+                // Müşteri adını kaydet
+                saveCustomerName(customerName);
                 showMessage('success', '✅ Siparişiniz başarıyla kaydedildi!');
                 resetForm();
             } catch (error) {
@@ -908,7 +911,11 @@
 
         // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', function() {
-            populateMasaSelect();
+            // Kaydedilmiş müşteri adını yükle
+            const savedCustomerName = loadCustomerName();
+            if (savedCustomerName) {
+                document.getElementById('customerName').value = savedCustomerName;
+            }
             updateTotal();
         });
     </script>
