@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahmud Cafe - Masa Paneli</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.2),
+                0 0 0 1px rgba(255,255,255,0.2);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00b894, #00cec9, #74b9ff);
+            background-size: 200% 200%;
+            animation: gradientShift 6s ease infinite;
+            color: white;
+            text-align: center;
+            padding: 35px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: headerRotate 8s linear infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes headerRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 
+                2px 2px 4px rgba(0,0,0,0.3),
+                0 0 30px rgba(255,255,255,0.6);
+            position: relative;
+            z-index: 1;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .masa-selection {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 
+                0 10px 30px rgba(116, 185, 255, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .masa-selection::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .masa-selection label {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: white;
+            font-size: 1.4em;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .masa-selection select {
+            width: 100%;
+            padding: 18px;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 1;
+        }
+
+        .masa-selection select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), inset 0 2px 5px rgba(0,0,0,0.05);
+            transform: translateY(-2px);
+        }
+
+        .products-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            margin-bottom: 20px;
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .product-item:hover {
+            border-color: #667eea;
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 
+                0 15px 35px rgba(102, 126, 234, 0.2),
+                0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-item:hover::before {
+            left: 100%;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .product-emoji {
+            font-size: 2em;
+            margin-right: 15px;
+        }
+
+        .product-details h3 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.2em;
+        }
+
+        .product-price {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-input button {
+            width: 45px;
+            height: 45px;
+            border: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3em;
+            font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantity-input button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transition: all 0.3s;
+            transform: translate(-50%, -50%);
+        }
+
+        .quantity-input button:hover {
+            background: linear-gradient(135deg, #5a67d8, #6c5ce7);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .quantity-input button:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .quantity-input button:active {
+            transform: translateY(0);
+        }
+
+        .quantity-input button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .quantity-input input {
+            width: 60px;
+            text-align: center;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .total-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .total-amount {
+            font-size: 2em;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 22px;
+            background: linear-gradient(135deg, #00b894, #00cec9, #74b9ff);
+            background-size: 200% 200%;
+            animation: gradientMove 3s ease infinite;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.4em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 184, 148, 0.3);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 184, 148, 0.4);
+        }
+
+        .submit-btn:hover::before {
+            opacity: 1;
+            animation: shine 0.6s ease-in-out;
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                margin: 0;
+                border-radius: 15px;
+                max-width: 100%;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .masa-selection {
+                padding: 20px;
+                margin-bottom: 25px;
+            }
+            
+            .masa-selection label {
+                font-size: 1.1em;
+            }
+            
+            .masa-selection select {
+                padding: 15px;
+                font-size: 1.1em;
+            }
+            
+            .product-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .product-info {
+                justify-content: center;
+            }
+            
+            .product-emoji {
+                font-size: 2.5em;
+            }
+            
+            .product-details h3 {
+                font-size: 1.3em;
+                margin-bottom: 8px;
+            }
+            
+            .product-price {
+                font-size: 1.2em;
+            }
+            
+            .quantity-input {
+                justify-content: center;
+            }
+            
+            .quantity-input button {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3em;
+            }
+            
+            .quantity-input input {
+                width: 70px;
+                font-size: 1.2em;
+            }
+            
+            .total-section {
+                padding: 25px;
+                margin: 25px 0;
+            }
+            
+            .total-amount {
+                font-size: 2.2em;
+            }
+            
+            .submit-btn {
+                padding: 18px;
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 25px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .form-container {
+                padding: 15px;
+            }
+            
+            .masa-selection {
+                padding: 15px;
+            }
+            
+            .product-item {
+                padding: 12px;
+            }
+            
+            .product-emoji {
+                font-size: 2em;
+            }
+            
+            .quantity-input button {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .total-amount {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Mahmud Cafe</h1>
+            <p>Masa Sipariş Paneli</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="success-message" id="successMessage">
+                ✅ Siparişiniz başarıyla kaydedildi!
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                ❌ Bir hata oluştu. Lütfen tekrar deneyin.
+            </div>
+            
+            <form id="orderForm">
+                <div class="masa-selection">
+                    <label for="masaSelect">🪑 Masa Seçin:</label>
+                    <select id="masaSelect" required>
+                        <option value="">Masa seçin...</option>
+                    </select>
+                </div>
+                
+                <div class="products-section">
+                    <h2>🍽️ Ürünler</h2>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-emoji">🫖</span>
+                            <div class="product-details">
+                                <h3>Çay</h3>
+                                <div class="product-price">7.5 TL</div>
+                            </div>
+                        </div>
+                        <div class="quantity-input">
+                            <button type="button" onclick="changeQuantity('cay', -1)">-</button>
+                            <input type="number" id="cay" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('cay', 1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-emoji">💧</span>
+                            <div class="product-details">
+                                <h3>Küçük Su</h3>
+                                <div class="product-price">7.5 TL</div>
+                            </div>
+                        </div>
+                        <div class="quantity-input">
+                            <button type="button" onclick="changeQuantity('kucukSu', -1)">-</button>
+                            <input type="number" id="kucukSu" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('kucukSu', 1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-emoji">🚰</span>
+                            <div class="product-details">
+                                <h3>Büyük Su</h3>
+                                <div class="product-price">7.5 TL</div>
+                            </div>
+                        </div>
+                        <div class="quantity-input">
+                            <button type="button" onclick="changeQuantity('buyukSu', -1)">-</button>
+                            <input type="number" id="buyukSu" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('buyukSu', 1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-emoji">🥪</span>
+                            <div class="product-details">
+                                <h3>Tost (Yarım)</h3>
+                                <div class="product-price">60 TL</div>
+                            </div>
+                        </div>
+                        <div class="quantity-input">
+                            <button type="button" onclick="changeQuantity('tostYarim', -1)">-</button>
+                            <input type="number" id="tostYarim" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('tostYarim', 1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-emoji">🥪🧀</span>
+                            <div class="product-details">
+                                <h3>Tost (Tam)</h3>
+                                <div class="product-price">120 TL</div>
+                            </div>
+                        </div>
+                        <div class="quantity-input">
+                            <button type="button" onclick="changeQuantity('tostTam', -1)">-</button>
+                            <input type="number" id="tostTam" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('tostTam', 1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-item">
+                        <div class="product-info">
+                            <span class="product-emoji">🥛</span>
+                            <div class="product-details">
+                                <h3>Ayran</h3>
+                                <div class="product-price">10 TL</div>
+                            </div>
+                        </div>
+                        <div class="quantity-input">
+                            <button type="button" onclick="changeQuantity('ayran', -1)">-</button>
+                            <input type="number" id="ayran" min="0" value="0" readonly>
+                            <button type="button" onclick="changeQuantity('ayran', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="total-section">
+                    <div class="total-amount" id="totalAmount">0 TL</div>
+                    <p>Toplam Tutar</p>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <p>⏳ Sipariş kaydediliyor...</p>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    🚀 Siparişi Kaydet
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Ürün fiyatları
+        const products = {
+            cay: { name: '🫖 Çay', price: 7.5 },
+            kucukSu: { name: '💧 Küçük Su', price: 7.5 },
+            buyukSu: { name: '🚰 Büyük Su', price: 7.5 },
+            tostYarim: { name: '🥪 Tost (Yarım)', price: 60 },
+            tostTam: { name: '🥪🧀 Tost (Tam)', price: 120 },
+            ayran: { name: '🥛 Ayran', price: 10 }
+        };
+
+        // Google Sheets Web App URL'i
+        const GOOGLE_SHEETS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+        // LocalStorage'dan masaları yükle
+        function loadMasalar() {
+            try {
+                const saved = localStorage.getItem('mahmudCafeMasalar');
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+            } catch (error) {
+                console.error('Masalar yüklenirken hata:', error);
+            }
+            return [];
+        }
+
+        // Masa seçeneklerini doldur
+        function populateMasaSelect() {
+            const masaSelect = document.getElementById('masaSelect');
+            const masalar = loadMasalar();
+            
+            // Mevcut seçenekleri temizle (ilk seçenek hariç)
+            masaSelect.innerHTML = '<option value="">Masa seçin...</option>';
+            
+            // Masaları ekle
+            masalar.forEach(masa => {
+                const option = document.createElement('option');
+                option.value = masa.name;
+                option.textContent = masa.name;
+                masaSelect.appendChild(option);
+            });
+        }
+
+        function changeQuantity(productId, change) {
+            const input = document.getElementById(productId);
+            const currentValue = parseInt(input.value) || 0;
+            const newValue = Math.max(0, currentValue + change);
+            input.value = newValue;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            let total = 0;
+            
+            Object.keys(products).forEach(productId => {
+                const quantity = parseInt(document.getElementById(productId).value) || 0;
+                total += quantity * products[productId].price;
+            });
+            
+            document.getElementById('totalAmount').textContent = total.toFixed(2) + ' TL';
+        }
+
+        function showMessage(type, message) {
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+            
+            successMsg.style.display = 'none';
+            errorMsg.style.display = 'none';
+            
+            if (type === 'success') {
+                successMsg.style.display = 'block';
+                successMsg.textContent = message;
+            } else {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = message;
+            }
+            
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+                errorMsg.style.display = 'none';
+            }, 5000);
+        }
+
+        function resetForm() {
+            document.getElementById('orderForm').reset();
+            Object.keys(products).forEach(productId => {
+                document.getElementById(productId).value = 0;
+            });
+            updateTotal();
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const selectedMasa = document.getElementById('masaSelect').value;
+            if (!selectedMasa) {
+                showMessage('error', '❌ Lütfen masa seçin!');
+                return;
+            }
+            
+            // Sipariş edilen ürünleri topla
+            const orderItems = [];
+            let hasItems = false;
+            
+            Object.keys(products).forEach(productId => {
+                const quantity = parseInt(document.getElementById(productId).value) || 0;
+                if (quantity > 0) {
+                    hasItems = true;
+                    orderItems.push({
+                        tarih: new Date().toLocaleString('tr-TR'),
+                        masaAdi: selectedMasa,
+                        urun: products[productId].name,
+                        adet: quantity,
+                        birimFiyat: products[productId].price,
+                        toplamFiyat: quantity * products[productId].price,
+                        ekleyen: 'customer' // Müşteri tarafından eklendi
+                    });
+                }
+            });
+            
+            if (!hasItems) {
+                showMessage('error', '❌ Lütfen en az bir ürün seçin!');
+                return;
+            }
+            
+            // Loading göster
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+            
+            try {
+                // Google Sheets'e gönder
+                await sendToGoogleSheets(orderItems);
+                showMessage('success', '✅ Siparişiniz başarıyla kaydedildi!');
+                resetForm();
+            } catch (error) {
+                console.error('Hata:', error);
+                showMessage('error', '❌ Sipariş kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+            }
+        });
+
+        async function sendToGoogleSheets(orderItems) {
+            // Eğer Google Sheets URL'i ayarlanmamışsa demo mode
+            if (GOOGLE_SHEETS_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+                console.log('Demo Mode - Sipariş verileri:', orderItems);
+                // Demo için 2 saniye bekle
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return;
+            }
+            
+            // Her sipariş öğesi için ayrı ayrı Google Sheets'e gönder
+            for (const item of orderItems) {
+                try {
+                    const response = await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(item),
+                        mode: 'cors'
+                    });
+                    
+                    // Response'u text olarak oku
+                    const responseText = await response.text();
+                    console.log('Google Sheets Response:', responseText);
+                    
+                    if (!response.ok) {
+                        console.error('HTTP Error:', response.status, response.statusText);
+                        throw new Error(`Google Sheets API hatası: ${response.status}`);
+                    }
+                    
+                    // JSON parse etmeye çalış
+                    try {
+                        const result = JSON.parse(responseText);
+                        if (!result.success) {
+                            throw new Error(result.error || 'Bilinmeyen hata');
+                        }
+                    } catch (parseError) {
+                        console.log('JSON parse hatası, ama response başarılı görünüyor:', parseError);
+                        // Eğer response başarılıysa devam et
+                    }
+                    
+                } catch (fetchError) {
+                    console.error('Fetch Error:', fetchError);
+                    throw new Error(`Bağlantı hatası: ${fetchError.message}`);
+                }
+            }
+        }
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            populateMasaSelect();
+            updateTotal();
+        });
+    </script>
+</body>
+</html> 
